@@ -7,11 +7,11 @@
 function zstd_buffer_compress(buffer, size, compressionLevel) {
     var _compBound = __gm_zstd_compress_bound(size);
     var _compBuffer = buffer_create(_compBound, buffer_fixed, 1);
-    buffer_fill(_compBuffer, 0, buffer_u8, 0, _compBound);          // slow
     var _result = __gm_zstd_compress_buffer(buffer_get_address(buffer), size, buffer_get_address(_compBuffer), compressionLevel);
 
     if(_result >= 0) {
         buffer_resize(_compBuffer, _result);
+        buffer_set_used_size(_compBuffer, _result);
         return _compBuffer;
     }
     buffer_delete(_compBuffer);
@@ -29,10 +29,10 @@ function zstd_buffer_decompress(buffer) {
     }
 
     var _decompBuffer = buffer_create(_decompBound, buffer_fixed, 1);
-    buffer_fill(_decompBuffer, 0, buffer_u8, 0, _decompBound);      // slow
     var _result = __gm_zstd_decompress_buffer(buffer_get_address(buffer), size, buffer_get_address(_decompBuffer));
 
     if(_result >= 0) {
+        buffer_set_used_size(_decompBuffer, _result);
         return _decompBuffer;
     }
     buffer_delete(_decompBuffer);
