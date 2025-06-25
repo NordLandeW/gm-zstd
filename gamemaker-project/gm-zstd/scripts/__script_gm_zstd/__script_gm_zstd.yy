@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__script_gm_zstd",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__script_gm_zstd",
+  "parent":{
+    "name":"gm-zstd",
+    "path":"folders/gm-zstd.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

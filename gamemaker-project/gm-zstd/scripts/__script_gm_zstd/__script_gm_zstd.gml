@@ -1,0 +1,40 @@
+
+/// @description Compresses a buffer using Zstandard compression
+/// @param {Id.Buffer} buffer - The buffer to compress
+/// @param {Real} size - The size of the buffer
+/// @param {Real} compressionLevel - The compression level to use (0~22)
+/// @returns {Id.Buffer} - The compressed buffer, or undefined if compression fails
+function zstd_buffer_compress(buffer, size, compressionLevel) {
+    var _compBound = __gm_zstd_compress_bound(size);
+    var _compBuffer = buffer_create(_compBound, buffer_fixed, 1);
+    buffer_fill(_compBuffer, 0, buffer_u8, 0, _compBound);          // slow
+    var _result = __gm_zstd_compress_buffer(buffer_get_address(buffer), size, buffer_get_address(_compBuffer), compressionLevel);
+
+    if(_result >= 0) {
+        buffer_resize(_compBuffer, _result);
+        return _compBuffer;
+    }
+    buffer_delete(_compBuffer);
+    return undefined;
+}
+
+/// @description Decompresses a buffer using Zstandard decompression
+/// @param {Id.Buffer} buffer - The buffer to decompress
+/// @returns {Id.Buffer} - The decompressed buffer, or undefined if decompression fails
+function zstd_buffer_decompress(buffer) {
+    var size = buffer_get_size(buffer);
+    var _decompBound = __gm_zstd_decompress_bound(buffer_get_address(buffer), size);
+    if(_decompBound < 0) {
+        return undefined;
+    }
+
+    var _decompBuffer = buffer_create(_decompBound, buffer_fixed, 1);
+    buffer_fill(_decompBuffer, 0, buffer_u8, 0, _decompBound);      // slow
+    var _result = __gm_zstd_decompress_buffer(buffer_get_address(buffer), size, buffer_get_address(_decompBuffer));
+
+    if(_result >= 0) {
+        return _decompBuffer;
+    }
+    buffer_delete(_decompBuffer);
+    return undefined;
+}
