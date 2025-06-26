@@ -35,3 +35,12 @@
         size_t const err = (fn);                                 \
         CHECK(!ZSTD_isError(err), "%s", ZSTD_getErrorName(err)); \
     } while (0)
+
+
+// Custom LZ4 Header (GMLZ4)
+
+#define GMLZ4_MAGIC (0x7F13420E)
+struct gmlz4_header_t{
+    unsigned int magic;
+    unsigned long long original_size;
+};
