@@ -2,7 +2,7 @@
 
 Simplified zstd/lz4 wrapper for GameMaker.
 
-Around 10x/20x (zstd/lz4) faster then original buffer compress/decompress functions.
+Around 10x/20x (zstd/lz4) faster than original buffer compress/decompress functions.
 
 Only Windows x64 version is precompiled. For other systems, you need to compile the extension yourself.
 
