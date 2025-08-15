@@ -182,8 +182,7 @@ GM_API double gm_zstd_decompress_bound(const char* sourceBuffer,
 
 GM_API double gm_lz4_compress_bound(double sourceSize) {
     size_t fSize = (size_t)sourceSize;
-    return (double)(LZ4_compressBound(fSize - sizeof(gmlz4_header_t)) +
-                    sizeof(gmlz4_header_t));
+    return (double)(LZ4_compressBound(fSize) + sizeof(gmlz4_header_t));
 }
 GM_API double gm_lz4_decompress_bound(const char* sourceBuffer,
                                       double sourceSize) {
