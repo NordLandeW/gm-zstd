@@ -62,7 +62,7 @@ var _dBuffLZ4HC = lz4_buffer_decompress(_cBuffLZ4HC);
 buffer_seek(_dBuffLZ4HC, buffer_seek_start, 0);
 for(var i=0; i<_testNums; i++) {
     if(buffer_read(_dBuffLZ4HC, buffer_u32) != i) {
-        show_debug_message("LZ4-fast failed.");
+        show_debug_message("LZ4-HC failed.");
         return;
     }
 }
