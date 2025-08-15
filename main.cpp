@@ -2,6 +2,7 @@
 #include "main.h"
 
 #include <lz4.h>
+#include <lz4hc.h>
 #include <lz4frame.h>
 
 #include <cstring>
@@ -54,8 +55,9 @@ GM_API double gm_zstd_compress_buffer(const char* sourceBuffer,
     return (double)cSize;
 }
 
-GM_API double gm_lz4_compress_buffer(const char* sourceBuffer,
-                                     double sourceSize, char* targetBuffer) {
+GM_API double gm_lz4_compress_buffer_fast(const char* sourceBuffer,
+                                          double sourceSize, char* targetBuffer,
+                                          double acceleration) {
     size_t fSize = (size_t)sourceSize;
 
     LZ4F_preferences_t prefs = kPrefs;
@@ -73,7 +75,47 @@ GM_API double gm_lz4_compress_buffer(const char* sourceBuffer,
     memcpy(fBuff, sourceBuffer, fSize);
 
     size_t cSize =
-        LZ4_compress_default(fBuff, cBuffS, fSize, cBuffSize - headerSize);
+        LZ4_compress_fast(fBuff, cBuffS, fSize, cBuffSize - headerSize, (int)acceleration);
+
+    if (cSize <= 0) {
+        output_log("!!! LZ4 compression failed.");
+        delete[] cBuff;
+        delete[] fBuff;
+        return -1;
+    }
+
+    cSize += headerSize;
+
+    // Success
+    memcpy(targetBuffer, cBuff, cSize);
+
+    delete[] cBuff;
+    delete[] fBuff;
+
+    return (double)cSize;
+}
+
+GM_API double gm_lz4_compress_buffer_hc(const char* sourceBuffer,
+                                          double sourceSize, char* targetBuffer,
+                                          double compressionLevel) {
+    size_t fSize = (size_t)sourceSize;
+
+    LZ4F_preferences_t prefs = kPrefs;
+    prefs.frameInfo.contentSize = fSize;
+
+    size_t headerSize = sizeof(gmlz4_header_t);
+    size_t cBuffSize = LZ4_compressBound(fSize) + headerSize;
+
+    char* const fBuff = new char[fSize];
+    char* const cBuff = new char[cBuffSize];
+    char* const cBuffS = cBuff + headerSize;
+
+    gmlz4_header_t header = {GMLZ4_MAGIC, fSize};
+    memcpy(cBuff, &header, headerSize);
+    memcpy(fBuff, sourceBuffer, fSize);
+
+    size_t cSize =
+        LZ4_compress_HC(fBuff, cBuffS, fSize, cBuffSize - headerSize, (int)compressionLevel);
 
     if (cSize <= 0) {
         output_log("!!! LZ4 compression failed.");
