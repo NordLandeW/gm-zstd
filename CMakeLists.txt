@@ -43,5 +43,5 @@ add_custom_command(
   TARGET gm_zstd
   POST_BUILD
   COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR} -P ${CMAKE_BINARY_DIR}/cmake_install.cmake
-  COMMENT "Copying DLL to GameMaker extension directory..."
+  COMMENT "Copying library to GameMaker extension directory..."
 )
