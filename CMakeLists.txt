@@ -1,6 +1,6 @@
 ﻿cmake_minimum_required (VERSION 3.12)
 
-project ("gm-zstd")
+project ("gm-zstd" C CXX ASM)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -11,11 +11,15 @@ add_library (gm_zstd SHARED "main.cpp")
 
 include_directories ("${CMAKE_SOURCE_DIR}/lib/zstd")
 include_directories ("${CMAKE_SOURCE_DIR}/lib/lz4")
-file(GLOB ZSTD_SOURCES "${CMAKE_SOURCE_DIR}/lib/zstd/*/*.c")
+file(GLOB ZSTD_SOURCES "${CMAKE_SOURCE_DIR}/lib/zstd/*/*.c" "${CMAKE_SOURCE_DIR}/lib/zstd/*/*.S")
 file(GLOB LZ4_SOURCES "${CMAKE_SOURCE_DIR}/lib/lz4/*.c")
 
 add_library(zstd STATIC ${ZSTD_SOURCES})
 add_library(lz4 STATIC ${LZ4_SOURCES})
+
+if(UNIX AND NOT APPLE)
+  set_target_properties(zstd lz4 PROPERTIES POSITION_INDEPENDENT_CODE ON)
+endif()
 
 target_link_libraries(gm_zstd PRIVATE zstd lz4)
 
